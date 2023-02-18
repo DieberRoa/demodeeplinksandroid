@@ -1,0 +1,66 @@
+trigger:
+- main
+
+pool:
+  vmImage: 'macOS-12'
+
+variables:
+   - group: epaycoDev
+
+stages:
+  - stage: Build
+    displayName: Build iOS Dev
+    jobs:
+      # Debug buildg
+      - job: Build_Ios_Dev
+        variables:
+          - name: SDK
+            value: iphoneos
+          - name: Configuration
+            value: Release
+        displayName: Build Dev
+        steps:
+
+          - task: InstallAppleCertificate@2
+            inputs:
+              certSecureFile: 'Rename.p12'
+              certPwd: '$(p12password)'
+              keychain: 'temp'
+              deleteCert: true
+
+          - task: InstallAppleProvisioningProfile@1
+            inputs:
+              provProfileSecureFile: 'cdcdepayco.mobileprovision'
+              removeProfile: true
+
+          - task: Xcode@5
+            inputs:
+              actions: 'build'
+              scheme: 'EPaycoApp'
+              sdk: '$(SDK)'
+              configuration: '$(Configuration)'
+              packageApp: true
+              xcWorkspacePath: 'EpaycoApp.xcodeproj'
+              xcodeVersion: 'specifyPath'
+              xcodeDeveloperDir: '/Applications/Xcode_14.1.app'
+              signingOption: 'manual'
+              signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
+              provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
+              args: '-verbose'
+
+          - task: CopyFiles@2
+            inputs:
+              contents: '**/*.ipa'
+              targetFolder: '$(build.artifactStagingDirectory)'
+
+          - task: PublishBuildArtifacts@1
+            inputs:
+              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+              ArtifactName: 'drop'
+              publishLocation: 'Container'
+          
+          - script: mv $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp.ipa $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa
+
+          - script: ls -R '$(Build.ArtifactStagingDirectory)'
+            
+          - script: curl -u "cicdintegration_Laurg:viqWDxypzrKLGjzhn7xV" -X POST "https://api-cloud.browserstack.com/app-live/upload" -F "file=@$(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa"
