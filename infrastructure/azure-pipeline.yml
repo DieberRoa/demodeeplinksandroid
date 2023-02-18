@@ -47,6 +47,6 @@ stages:
           
           - script: mv $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp.ipa $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa
 
-          - script: ls -R '$(Build.ArtifactStagingDirectory)'
+          # - script: ls -R '$(Build.ArtifactStagingDirectory)'
             
-          - script: curl -u "cicdintegration_Laurg:viqWDxypzrKLGjzhn7xV" -X POST "https://api-cloud.browserstack.com/app-live/upload" -F "file=@$(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa"
+          # - script: curl -u "cicdintegration_Laurg:viqWDxypzrKLGjzhn7xV" -X POST "https://api-cloud.browserstack.com/app-live/upload" -F "file=@$(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa"
