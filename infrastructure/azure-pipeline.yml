@@ -20,7 +20,7 @@ stages:
             value: Release
         displayName: Build Dev
         steps:
-          -
+        
           - task: Gradle@2
             inputs:
               workingDirectory: ''
