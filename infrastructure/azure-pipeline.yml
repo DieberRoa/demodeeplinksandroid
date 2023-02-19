@@ -13,11 +13,6 @@ stages:
     jobs:
       # Debug buildg
       - job: Build_Android_Dev
-        variables:
-          - name: SDK
-            value: iphoneos
-          - name: Configuration
-            value: Release
         displayName: Build Dev
         steps:
 
@@ -38,7 +33,7 @@ stages:
               publishJUnitResults: true
               testResultsFiles: '**/TEST-*.xml'
               tasks: 'assembleDebug test'
-            displayName: gradlew assembleDebug test
+            displayName: Compile to APK
 
           - task: CopyFiles@2
             inputs:
@@ -51,8 +46,8 @@ stages:
               artifactName: 'drop'
               publishLocation: 'Container'
           
-          # - script: mv $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp.ipa $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa
+          - script: mv $(Build.ArtifactStagingDirectory)/app/build/outputs/apk/debug/app-debug.apk $(Build.ArtifactStagingDirectory)/app/build/outputs/apk/debug/app-dev-debug.apk
 
           - script: ls -R '$(Build.ArtifactStagingDirectory)'
             
-          # - script: curl -u "cicdintegration_Laurg:viqWDxypzrKLGjzhn7xV" -X POST "https://api-cloud.browserstack.com/app-live/upload" -F "file=@$(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa"
+          - script: curl -u "cicdintegration_Laurg:viqWDxypzrKLGjzhn7xV" -X POST "https://api-cloud.browserstack.com/app-live/upload" -F "file=@$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/debug/app-dev-debug.apk"
