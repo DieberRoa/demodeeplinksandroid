@@ -51,7 +51,7 @@ stages:
               artifactName: 'drop'
               publishLocation: 'Container'
           
-          - script: mv $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp.ipa $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa
+          # - script: mv $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp.ipa $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa
 
           # - script: ls -R '$(Build.ArtifactStagingDirectory)'
             
