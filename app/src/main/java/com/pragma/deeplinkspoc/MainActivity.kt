@@ -18,6 +18,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.pragma.deeplinkspoc.navigation.AppNavigation
 import com.pragma.deeplinkspoc.ui.theme.DeeplinkspocTheme
+import android.content.Intent
+import android.net.Uri
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -33,6 +35,7 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
+        // ATTENTION: This was auto-generated to handle app links.
     }
 }
 
