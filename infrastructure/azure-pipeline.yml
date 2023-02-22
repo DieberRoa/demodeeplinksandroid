@@ -9,58 +9,45 @@ variables:
 
 stages:
   - stage: Build
-    displayName: Build iOS Dev
+    displayName: Build Android Dev
     jobs:
       # Debug buildg
-      - job: Build_Ios_Dev
-        variables:
-          - name: SDK
-            value: iphoneos
-          - name: Configuration
-            value: Release
+      - job: Build_Android_Dev
         displayName: Build Dev
         steps:
 
-          - task: InstallAppleCertificate@2
+          - task: JavaToolInstaller@0
             inputs:
-              certSecureFile: 'Rename.p12'
-              certPwd: '$(p12password)'
-              keychain: 'temp'
-              deleteCert: true
-
-          - task: InstallAppleProvisioningProfile@1
+              versionSpec: '11'
+              jdkArchitectureOption: 'x64'
+              jdkSourceOption: 'PreInstalled'
+        
+          - task: Gradle@2
             inputs:
-              provProfileSecureFile: 'cdcdepayco.mobileprovision'
-              removeProfile: true
-
-          - task: Xcode@5
-            inputs:
-              actions: 'build'
-              scheme: 'EPaycoApp'
-              sdk: '$(SDK)'
-              configuration: '$(Configuration)'
-              packageApp: true
-              xcWorkspacePath: 'EpaycoApp.xcodeproj'
-              xcodeVersion: 'specifyPath'
-              xcodeDeveloperDir: '/Applications/Xcode_14.1.app'
-              signingOption: 'manual'
-              signingIdentity: '$(APPLE_CERTIFICATE_SIGNING_IDENTITY)'
-              provisioningProfileUuid: '$(APPLE_PROV_PROFILE_UUID)'
-              args: '-verbose'
+              workingDirectory: ''
+              gradleWrapperFile: 'gradlew'
+              gradleOptions: '-Xmx3072m'
+              javaHomeOption: 'JDKVersion'
+              jdkVersionOption: '11'
+              jdkArchitectureOption: 'x64'
+              publishJUnitResults: true
+              testResultsFiles: '**/TEST-*.xml'
+              tasks: 'assembleDebug test'
+            displayName: Compile to APK
 
           - task: CopyFiles@2
             inputs:
-              contents: '**/*.ipa'
+              contents: '**/*.apk'
               targetFolder: '$(build.artifactStagingDirectory)'
 
           - task: PublishBuildArtifacts@1
             inputs:
-              PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-              ArtifactName: 'drop'
+              pathToPublish: '$(Build.ArtifactStagingDirectory)'
+              artifactName: 'drop'
               publishLocation: 'Container'
           
-          - script: mv $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp.ipa $(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa
+          - script: mv $(Build.ArtifactStagingDirectory)/app/build/outputs/apk/debug/app-debug.apk $(Build.ArtifactStagingDirectory)/app/build/outputs/apk/debug/app-dev-debug.apk
 
           - script: ls -R '$(Build.ArtifactStagingDirectory)'
             
-          - script: curl -u "cicdintegration_Laurg:viqWDxypzrKLGjzhn7xV" -X POST "https://api-cloud.browserstack.com/app-live/upload" -F "file=@$(Build.ArtifactStagingDirectory)/output/$(SDK)/$(Configuration)/EPaycoApp-dev.ipa"
+          - script: curl -u "cicdintegration_Laurg:viqWDxypzrKLGjzhn7xV" -X POST "https://api-cloud.browserstack.com/app-live/upload" -F "file=@$(Build.ArtifactStagingDirectory)/app/build/outputs/apk/debug/app-dev-debug.apk"

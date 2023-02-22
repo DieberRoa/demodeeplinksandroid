@@ -25,7 +25,16 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        debug {
+            testCoverageEnabled true
+        }
     }
+
+    lint {
+        abortOnError false
+        checkReleaseBuilds false
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -44,6 +53,87 @@ android {
             excludes += '/META-INF/{AL2.0,LGPL2.1}'
         }
     }
+}
+
+jacoco {
+    toolVersion = "0.8.8"
+    reportsDirectory = layout.buildDirectory.dir('customJacocoReportDir')
+}
+
+
+task jacocoTestReport(type: JacocoReport,
+        dependsOn: ['testDebugUnitTest',
+                    'createDebugCoverageReport']) {
+    group = "Reporting"
+    description = "Generate Jacoco coverage reports after running tests."
+
+    def excludes = [
+            // data binding
+            'android/databinding/**/*.class',
+            '**/android/databinding/*Binding.class',
+            '**/android/databinding/*',
+            '**/androidx/databinding/*',
+            '**/BR.*',
+            // android
+            '**/R.class',
+            '**/R$*.class',
+            '**/BuildConfig.*',
+            '**/Manifest*.*',
+            '**/*Test*.*',
+            'android/**/*.*',
+            // butterKnife
+            '**/*$ViewInjector*.*',
+            '**/*$ViewBinder*.*',
+            // dagger
+            '**/*_MembersInjector.class',
+            '**/Dagger*Component.class',
+            '**/Dagger*Component$Builder.class',
+            '**/*Module_*Factory.class',
+            '**/di/module/*',
+            '**/*_Factory*.*',
+            '**/*Module*.*',
+            '**/*Dagger*.*',
+            '**/*Hilt*.*',
+            // kotlin
+            '**/*MapperImpl*.*',
+            '**/*$ViewInjector*.*',
+            '**/*$ViewBinder*.*',
+            '**/BuildConfig.*',
+            '**/*Component*.*',
+            '**/*BR*.*',
+            '**/Manifest*.*',
+            '**/*$Lambda$*.*',
+            '**/*Companion*.*',
+            '**/*Module*.*',
+            '**/*Dagger*.*',
+            '**/*Hilt*.*',
+            '**/*MembersInjector*.*',
+            '**/*_MembersInjector.class',
+            '**/*_Factory*.*',
+            '**/*_Provide*Factory*.*',
+            '**/*Extensions*.*',
+            // sealed and data classes
+            '**/*$Result.*',
+            '**/*$Result$*.*',
+//            'com/pragma/demojenkinsapp/data/**.*',
+//            'com/pragma/demojenkinsapp/di/**.*',
+//            'com/pragma/demojenkinsapp/domain/**.*',
+//            'com/pragma/demojenkinsapp/ui/viewmodels/**.*',
+//            'com/pragma/demojenkinsapp/CoreApplication.*',
+    ]
+
+    def debugTree = fileTree(dir:
+            "${buildDir}/intermediates/javac/debug/classes",
+            excludes: excludes
+    )
+
+    def mainSrc = "/src/main/java"
+
+    sourceDirectories.setFrom(files([mainSrc]))
+
+    classDirectories.setFrom([debugTree])
+    executionData.setFrom(fileTree(dir: "${buildDir}", includes:[
+            "/jacoco/testDebugUnitTest.exec"]))
 }
 
 dependencies {
