@@ -25,7 +25,7 @@ fun AppNavigation(){
             deepLinks = listOf(
                 navDeepLink {
                     label = "intent"
-                    uriPattern = "appone://cualquier.direccion.co/detail/{id}"
+                    uriPattern = "https://storagedeeplink.z13.web.core.windows.net/detail/{id}"
                     action = Intent.ACTION_VIEW
                 }
             ),

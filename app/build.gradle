@@ -9,7 +9,7 @@ android {
     compileSdk 33
 
     defaultConfig {
-        applicationId "com.pragma.deeplinkspoc"
+        applicationId "com.dieberroa.deeplinkspoc"
         minSdk 28
         targetSdk 33
         versionCode 1
